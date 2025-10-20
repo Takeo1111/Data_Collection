@@ -6,6 +6,7 @@ import pandas as pd
 import yfinance as yf
 from pathlib import Path
 from dotenv import load_dotenv
+from datetime import datetime, timedelta
 
 # Load API keys from .env file
 if os.path.exists('.env'):
@@ -19,17 +20,17 @@ if os.path.exists('.env'):
 # ------------------------------------------
 # CONFIGURATION
 # ------------------------------------------
-TICKERS = ["AAPL", "NVDA", "MSFT", "AMZN", "GOOGL", "META", "TSLA"]
-START = "2020-01-01"
+# TICKERS = ["AAPL", "NVDA", "MSFT", "AMZN", "GOOGL", "META", "TSLA"]
+TICKERS = ["GOOGL"]
+START = "2023-01-27"
 END = None  # None = today
 USE_MARKETAUX = True  # Change to False if you want to use Mediastack instead
 
 # News collection settings
 MAX_ARTICLES_PER_STOCK = 100  # Maximum articles to collect per stock (reduced due to API limits)
-NEWS_DATE_RANGE_DAYS = 1095  # How many days back to search for news (3 years)
 ARTICLES_PER_REQUEST = 3  # Marketaux free tier limit
 
-# Folder structure
+# Folder s
 DATA_DIR = Path("data")
 PRICES_DIR = DATA_DIR / "prices"
 NEWS_DIR = DATA_DIR / "news"
@@ -74,13 +75,13 @@ def collect_news_marketaux(symbol, start, end):
     rows, page = [], 1
     
     # Calculate date range for news (last NEWS_DATE_RANGE_DAYS days)
-    from datetime import datetime, timedelta
-    if end is None:
-        end_date = datetime.now()
-    else:
-        end_date = datetime.strptime(end, "%Y-%m-%d")
+   
+    if start is None:
+        start = START  
     
-    start_date = end_date - timedelta(days=NEWS_DATE_RANGE_DAYS)
+    start_date = datetime.strptime(start, "%Y-%m-%d")
+    end_date = datetime.now()
+
     news_start = start_date.strftime("%Y-%m-%d")
     news_end = end_date.strftime("%Y-%m-%d")
     
@@ -88,7 +89,6 @@ def collect_news_marketaux(symbol, start, end):
     print(f"[DEBUG] API Key: {key[:10]}...{key[-5:] if len(key) > 15 else 'SHORT'}")
 
     # Split the date range into smaller chunks to get more articles
-    from datetime import datetime, timedelta
     current_end = datetime.strptime(news_end, "%Y-%m-%d")
     chunk_days = 30  # 30-day chunks
     
@@ -202,25 +202,32 @@ def collect_news():
     all_frames = []
 
     # Basic search queries
+    # queries = {
+    #     "AAPL": "Apple OR AAPL",
+    #     "NVDA": "Nvidia OR NVDA",
+    #     "MSFT": "Microsoft OR MSFT",
+    #     "AMZN": "Amazon OR AMZN",
+    #     "GOOGL": "Alphabet OR Google OR GOOGL",
+    #     "META": "Meta OR Facebook OR META",
+    #     "TSLA": "Tesla OR TSLA"
+    # }
     queries = {
-        "AAPL": "Apple OR AAPL",
-        "NVDA": "Nvidia OR NVDA",
-        "MSFT": "Microsoft OR MSFT",
-        "AMZN": "Amazon OR AMZN",
         "GOOGL": "Alphabet OR Google OR GOOGL",
-        "META": "Meta OR Facebook OR META",
-        "TSLA": "Tesla OR TSLA"
     }
 
     # Additional search terms for more comprehensive news collection
+    # additional_queries = {
+    #     "AAPL": ["Apple Inc", "iPhone", "iPad", "MacBook", "Apple Watch", "Tim Cook"],
+    #     "NVDA": ["NVIDIA", "GPU", "AI chips", "Jensen Huang", "RTX", "CUDA"],
+    #     "MSFT": ["Microsoft", "Azure", "Office 365", "Windows", "Satya Nadella", "Xbox"],
+    #     "AMZN": ["Amazon", "AWS", "Jeff Bezos", "Andy Jassy", "Prime", "Alexa"],
+    #     "GOOGL": ["Google", "Alphabet", "Sundar Pichai", "YouTube", "Android", "Chrome"],
+    #     "META": ["Meta", "Facebook", "Mark Zuckerberg", "Instagram", "WhatsApp", "VR"],
+    #     "TSLA": ["Tesla", "Elon Musk", "Model S", "Model 3", "Model Y", "Cybertruck"]
+    # }
+
     additional_queries = {
-        "AAPL": ["Apple Inc", "iPhone", "iPad", "MacBook", "Apple Watch", "Tim Cook"],
-        "NVDA": ["NVIDIA", "GPU", "AI chips", "Jensen Huang", "RTX", "CUDA"],
-        "MSFT": ["Microsoft", "Azure", "Office 365", "Windows", "Satya Nadella", "Xbox"],
-        "AMZN": ["Amazon", "AWS", "Jeff Bezos", "Andy Jassy", "Prime", "Alexa"],
-        "GOOGL": ["Google", "Alphabet", "Sundar Pichai", "YouTube", "Android", "Chrome"],
-        "META": ["Meta", "Facebook", "Mark Zuckerberg", "Instagram", "WhatsApp", "VR"],
-        "TSLA": ["Tesla", "Elon Musk", "Model S", "Model 3", "Model Y", "Cybertruck"]
+       "GOOGL": ["Google", "Alphabet", "Sundar Pichai", "YouTube", "Android", "Chrome"],
     }
 
     for t in TICKERS:
@@ -252,7 +259,7 @@ def collect_news():
 if __name__ == "__main__":
     print("[INFO] Starting data collection script...")
     try:
-        collect_prices()
+        # collect_prices()
         collect_news()
         print("\n[SUCCESS] Data collection completed successfully!\n")
     except Exception as e:
