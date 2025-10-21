@@ -21,7 +21,7 @@ if os.path.exists('.env'):
 # CONFIGURATION
 # ------------------------------------------
 # TICKERS = ["AAPL", "NVDA", "MSFT", "AMZN", "GOOGL", "META", "TSLA"]
-TICKERS = ["GOOGL"]
+TICKERS = ["TSLA"]
 START = "2023-01-27"
 END = None  # None = today
 USE_MARKETAUX = True  # Change to False if you want to use Mediastack instead
@@ -212,7 +212,7 @@ def collect_news():
     #     "TSLA": "Tesla OR TSLA"
     # }
     queries = {
-        "GOOGL": "Alphabet OR Google OR GOOGL",
+        "TSLA": "Tesla OR TSLA"
     }
 
     # Additional search terms for more comprehensive news collection
@@ -227,7 +227,7 @@ def collect_news():
     # }
 
     additional_queries = {
-       "GOOGL": ["Google", "Alphabet", "Sundar Pichai", "YouTube", "Android", "Chrome"],
+       "TSLA": ["Tesla", "Elon Musk", "Model S", "Model 3", "Model Y", "Cybertruck"]
     }
 
     for t in TICKERS:
